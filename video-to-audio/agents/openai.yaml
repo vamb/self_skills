@@ -1,0 +1,6 @@
+interface:
+  display_name: "Video to Audio"
+  short_description: "Extract WAV audio and split by silence."
+  default_prompt: "Use $video-to-audio to extract WAV audio from this video, splitting it into chunks under 10MB if needed."
+policy:
+  allow_implicit_invocation: true
