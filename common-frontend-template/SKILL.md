@@ -46,8 +46,19 @@ Use a single search object as the list query source of truth.
 - `handleFilterSearch`: update search state, call API immediately, reset to first page.
 - `handleOnChange`: update page/size from table pagination and call API.
 - `fetchTableData`: clone/normalize params, set loading, call service, set `tableData` and `total`, handle errors.
+- When every search control has `allowClear=true` and any search value change triggers list querying, do not add a separate reset button. Clearing a field should flow through the same search-change handler and refresh the list.
 
 For Ant Design table loading inside flexible layouts, prefer a custom absolute-position overlay around the table panel instead of `Table loading` or `Spin` wrapping the table, because generated `ant-spin-container` DOM can disturb flex height.
+
+## Table Toolbar
+
+For standard Ant Design table pages, keep the right-side table toolbar purposeful and minimal:
+
+- Do not add a refresh icon button unless the source page or user explicitly requires it.
+- Add one density/size icon button, commonly using `VerticalAlignMiddleOutlined`, to configure the table `size` prop such as `large`, `middle`, and `small`.
+- Add one settings icon button, commonly using `SettingOutlined`, to configure which table columns are visible.
+- Render column visibility options in a vertical column layout, not a single horizontal row, so long column names remain readable.
+- Keep add/create actions separate from these table configuration icons.
 
 ## Migration Checklist
 
@@ -58,8 +69,10 @@ For Ant Design table loading inside flexible layouts, prefer a custom absolute-p
 5. Move list-only logic into `FeaturePage.tsx`.
 6. Move create/update form into `components/FeatureFormModal.tsx`.
 7. Move detail and selector dialogs into their own files.
-8. Keep route entry `index.ts` small and export the content-wrapped page.
-9. Build after each major split.
+8. Check search controls: if they are `allowClear` and change-driven, remove redundant reset buttons and let clearing trigger the standard list query.
+9. Configure table toolbar icons: keep density tied to `Table size`, settings tied to column visibility, and avoid redundant refresh buttons unless required.
+10. Keep route entry `index.ts` small and export the content-wrapped page.
+11. Build after each major split.
 
 ## Page Shell Rules
 
