@@ -47,6 +47,8 @@ Use a single search object as the list query source of truth.
 - `handleOnChange`: update page/size from table pagination and call API.
 - `fetchTableData`: clone/normalize params, set loading, call service, set `tableData` and `total`, handle errors.
 - When every search control has `allowClear=true` and any search value change triggers list querying, do not add a separate reset button. Clearing a field should flow through the same search-change handler and refresh the list.
+- Keep list search controls close to the page/list logic when they only pass through the page's `search` state and handlers. Prefer rendering the search area in `FeaturePage` with controlled inputs over creating a thin `SearchToolbar` component that duplicates wiring through props. Split a search component only when it owns meaningful reusable behavior or complex local UI state.
+- Use the mature admin-page header-search pattern for search/action areas: left side for query controls, right side for create/batch/view actions. Inputs should bind to the single `search` object; text inputs call `handleInputSearch`, filter controls call `handleFilterSearch`, and the query button calls `fetchTableData` with the current search object.
 
 For Ant Design table loading inside flexible layouts, prefer a custom absolute-position overlay around the table panel instead of `Table loading` or `Spin` wrapping the table, because generated `ant-spin-container` DOM can disturb flex height.
 

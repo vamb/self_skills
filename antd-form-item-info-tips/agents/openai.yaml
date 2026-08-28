@@ -1,0 +1,3 @@
+interface:
+  display_name: "不影响antdForm的form.item级别infoTips"
+  short_description: "在 Ant Design Form.Item 字段旁添加不破坏表单绑定的 Tooltip 信息提示"
