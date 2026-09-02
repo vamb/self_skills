@@ -1,0 +1,4 @@
+interface:
+  display_name: "前端过滤数据"
+  short_description: "前端本地列表过滤与多选筛选模式"
+  default_prompt: "Use $frontend-filter-data to add local filtering to a frontend table."
