@@ -17,6 +17,13 @@ Keep three pieces distinct:
 
 Do not repeatedly filter from the current display list as the canonical data source. Always start each recomputation from the original list so clearing filters can restore the full result set.
 
+When the page also has an API query, keep API querying and frontend filtering separate:
+
+- API calls initialize or refresh the original list only. For example, opening a modal can call `queryList({ tab: 1 })`, and a "查询" button may call the same API again to refresh the original list.
+- Frontend filter controls such as `Input`, `Select`, and multi-select `Select` must filter the local original list and update the display list only.
+- Do not merge frontend-only filter conditions into the API request parameters when the backend does not support those filters.
+- After refreshing the original list from the API, apply the current local filter state to the newly returned list before updating the table.
+
 ## filterArr Helper
 
 The reusable helper should support these modes:
@@ -52,6 +59,13 @@ Use `isInput = true` for text input fuzzy matching, `isInput = false` for exact 
 
 Treat `null`, `undefined`, an empty string, and an empty array as "no filter" so clearing a control does not accidentally return an empty table.
 
+The `key` argument must correspond to the related Ant Design table column's `dataIndex`:
+
+- For a normal column such as `dataIndex: "name"`, call `filterArr(list, search, "name", true)`.
+- For a nested column such as `dataIndex: ["rpa", "name"]`, prefer enhancing the shared `filterArr` helper to support array keys, then call `filterArr(list, search, ["rpa", "name"], true)`.
+- Do not invent extra frontend-only field names such as `_filterName`, `rpaName`, or `policeDisplayName` when they do not match the table's `dataIndex`.
+- If a display value is calculated in `render`, first check whether an existing real data field can be used. Only introduce a derived field when the table column itself also uses that same field as `dataIndex`.
+
 ## Applying It
 
 Recompute the display list by chaining filters from broad to narrow:
@@ -67,6 +81,28 @@ const fetchTblData = param => {
 ```
 
 For input controls, debounce if the local list is large or the existing page already uses delayed input search. For select controls, filtering can usually run immediately.
+
+If the original list is loaded from an API, split the code into two clear responsibilities:
+
+```js
+const filterTblData = (param, list = sourceList) => {
+  const reqParam = param ? param : search
+  const nameList = filterArr(list, reqParam, "name", true)
+  const stateList = filterArr(nameList, reqParam, "state", false)
+  setTblList(stateList)
+}
+
+const refreshTblData = param => {
+  const reqParam = param ? param : search
+  queryList({ tab: 1 }).then(res => {
+    const nextSourceList = Array.isArray(res) ? res : []
+    setSourceList(nextSourceList)
+    filterTblData(reqParam, nextSourceList)
+  })
+}
+```
+
+In this pattern, filter controls call `filterTblData`, while opening the modal or clicking the API refresh/query button calls `refreshTblData`.
 
 For Ant Design multi-select filters, store the selected value as an array and keep the default value as an array too:
 
@@ -92,3 +128,5 @@ After updating code, verify:
 - Single-select filters still use exact matching.
 - Multi-select filters return rows whose field value is contained in the selected array.
 - Existing callers of `filterArr` continue to work because `isMultiple` defaults to `false`.
+- Each `filterArr` key matches the related table column's `dataIndex`.
+- Frontend-only filters are not included in API request parameters unless the backend explicitly supports them.
