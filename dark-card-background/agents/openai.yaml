@@ -1,0 +1,4 @@
+interface:
+  display_name: "深色卡片背景色"
+  short_description: "深蓝渐变与轻网格光效，统一卡片背景、透明内部模块和分隔边框"
+  default_prompt: "使用 $dark-card-background 为当前卡片应用深色卡片背景色，保留边框和现有交互。"
